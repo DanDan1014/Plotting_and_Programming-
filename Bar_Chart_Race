@@ -1,0 +1,38 @@
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import pandas as pd
+
+df = pd.read_csv('baseball_data', usecols=['name', 'homeruns', 'year','position'])
+df.head(10)
+
+current_year = 22
+
+dff = (df[df['year'].eq(current_year)].sort_values(by='homeruns', ascending=True).head(5))
+
+colors = dict(zip(
+    ['outfielder', 'catcher', 'FirstBase', 'Shortstop','Pitcher','ThirdBase'],
+   ['red', 'blue', 'orange', 'green', 'yellow', 'silver']))
+
+s_color = df.set_index('name')['position'].to_dict()
+
+fig, ax = plt.subplots(figsize=(15, 8))
+
+
+def bar_chart(year):
+    dff = df[df['year'].eq(year)].sort_values(by='homeruns', ascending=True).tail(5)
+    ax.clear()
+    ax.barh(dff['name'], dff['homeruns'], edgecolor="black", color=[colors[s_color[x]] for x in dff['name']])
+    ax.grid(which='major', axis='x', linestyle='-')
+    ax.set_axisbelow(True)
+    ax.text(1, 0.4, year, transform=ax.transAxes, color='silver', size=46, ha='right', weight=800)
+    ax.text(0, 1.12, 'Home Runs Throughout Career',
+            transform=ax.transAxes, size=35, weight=1, ha='left')
+    plt.box(False)
+
+
+bar_chart(22)
+
+animator = animation.FuncAnimation(fig, bar_chart, frames=range(1, 22), interval=300)
+
+plt.show()
+
